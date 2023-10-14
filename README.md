@@ -1,0 +1,2 @@
+# huft
+Huffman coding visualizer
