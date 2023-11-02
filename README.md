@@ -23,7 +23,7 @@ cmake --build .
 ### License
 This project is now licensed under the Unlicense.
 
-## Contributers
+### Contributers
 - [Neville](https://github.com/s3dman)
 - [Nihal 2](https://github.com/snaupdog)
 - [Marthandan](https://github.com/n3v1nnn)
