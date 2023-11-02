@@ -1,23 +1,16 @@
-cmake_minimum_required(VERSION 3.16)
-project(huff-etv LANGUAGES CXX)
+cmake_minimum_required(VERSION 3.15)
+project(huft)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+find_package(raylib 3.0 REQUIRED) 
 
-include(FetchContent)
-FetchContent_Declare(SFML GIT_REPOSITORY https://github.com/SFML/SFML.git GIT_TAG 2.6.x)
-FetchContent_MakeAvailable(SFML)
+set(CMAKE_C_STANDARD 11)
 
-add_executable(huff-etv src/main.cpp)
-target_link_libraries(huff-etv PRIVATE sfml-graphics)
-target_compile_features(huff-etv PRIVATE cxx_std_17)
+add_executable(${PROJECT_NAME} src/main.c)
 
-if(WIN32)
-    add_custom_command(
-        TARGET huff-etv
-        COMMENT "Copy OpenAL DLL"
-        PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${SFML_SOURCE_DIR}/extlibs/bin/$<IF:$<EQUAL:${CMAKE_SIZEOF_VOID_P},8>,x64,x86>/openal32.dll $<TARGET_FILE_DIR:huff-etv>
-        VERBATIM)
+target_link_libraries(${PROJECT_NAME} raylib)
+
+if (APPLE)
+    target_link_libraries(${PROJECT_NAME} "-framework IOKit")
+    target_link_libraries(${PROJECT_NAME} "-framework Cocoa")
+    target_link_libraries(${PROJECT_NAME} "-framework OpenGL")
 endif()
-
-install(TARGETS huff-etv)
