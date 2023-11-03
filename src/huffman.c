@@ -48,6 +48,15 @@ void freeTree(node* root) {
     free(root);
 }
 
+node* treeInit(char[]) {
+    return 0;
+
+}
+node* treeState(node* tree) {
+
+    return tree;
+}
+
 int main() {
     char chars[] = {'A', 'B', 'C', 'D', 'E'};
     unsigned freqs[] = {10, 15, 12, 3, 4};
