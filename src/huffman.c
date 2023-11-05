@@ -47,11 +47,17 @@ void displayTree(node* root, int level) {
     }
 }
 
-void freeTree(node* root) {
+void freeNodes(node* root) {
     if (root == NULL) return;
-    freeTree(root->left);
-    freeTree(root->right);
+    freeNodes(root->left);
+    freeNodes(root->right);
     free(root);
+}
+
+void freeTree(tree* tree) {
+    freeNodes(tree->root);
+    free(tree->nodes);
+    free(tree);
 }
 
 tree* treeInit(const char* input) {
@@ -154,8 +160,6 @@ int main() {
         else break;
     }
 
-    freeTree(t->root);
-    free(t->nodes);
-    free(t);
+    freeTree(t);
     return 0;
 }
