@@ -48,9 +48,10 @@ void freeTree(node* root) {
     free(root);
 }
 
-int main() {
-    char chars[] = {'A', 'B', 'C', 'D', 'E'};
-    unsigned freqs[] = {10, 15, 12, 3, 4};
+// int main() {
+struct node *createtree() {
+    char chars[] = {'A', 'B', 'C','D', 'E'};
+    unsigned freqs[] = { 5, 8, 2, 4, 3};
     int size = sizeof(chars) / sizeof(chars[0]);
 
     node* nodes[size];
@@ -87,6 +88,7 @@ int main() {
 
             huffmanTree = newNode;
             displayTree(huffmanTree, 0);
+
         } else if (strcmp(input, "q") == 0) {
             break;
         } else {
@@ -94,7 +96,9 @@ int main() {
         }
     }
 
+    return huffmanTree;
     if (huffmanTree) freeTree(huffmanTree);
-
     return 0;
+
+    // return NULL;
 }
