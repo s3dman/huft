@@ -22,7 +22,7 @@ node* mergeNodes(node* left, node* right) {
     return newNode;
 }
 
-void displayTree(node* root, int level) {
+void displayTree(node* root, int level) { // DEBUG
     if (root != NULL) {
         if (root->leaf) {
             printf("Character: %c, Frequency: %u, Level: %d\n", root->c, root->freq, level);
@@ -103,7 +103,6 @@ tree* treeInit(const char* input) {
 
 int treeStateNext(tree* t) {
     if(t->size <= 1) {
-        displayTree(t->root, 0);
         return 1;
     }
     for (int i = 0; i < t->size - 1; i++) {
@@ -116,21 +115,10 @@ int treeStateNext(tree* t) {
         }
     }
 
-    for (int k = 0; k < t->size; k++) {
-        printf("%d ", t->nodes[k]->freq);
-    }
-    printf("\n");
-
     node* newNode = mergeNodes(t->nodes[t->size - 1], t->nodes[t->size - 2]);
     t->nodes[t->size - 2] = newNode;
     t->size--;
 
-    for (int k = 0; k < t->size; k++) {
-        printf("%d ", t->nodes[k]->freq);
-    }
-    printf("\n");
-
     t->root = newNode;
-    displayTree(t->root, 0);
     return 0;
 }

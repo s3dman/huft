@@ -53,12 +53,11 @@ int main() {
 
     SetTargetFPS(60);
 
-    char ar[] = "aabbbccccdddee";
+    char ar[] = "nialksjdflsdjfkldsjfldsjflksdjlfkjdl";
     tree *t = treeInit(ar);
-    treeStateNext(t);
-    treeStateNext(t);
-    treeStateNext(t);
-    treeStateNext(t);
+    while(1) {
+        if(treeStateNext(t) == 1) break;
+    }
 
     while (!WindowShouldClose()) {
         previousMousePosition = mousePosition;
@@ -74,8 +73,8 @@ int main() {
         EndDrawing();
 
         if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
-            camera.target.x += (mousePosition.x - previousMousePosition.x);
-            camera.target.y += (mousePosition.y - previousMousePosition.y);
+            camera.target.x -= (mousePosition.x - previousMousePosition.x);
+            camera.target.y -= (mousePosition.y - previousMousePosition.y);
         }
     }
 
