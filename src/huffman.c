@@ -2,20 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
-
-typedef struct node {
-    bool leaf;
-    char c;
-    unsigned freq;
-    struct node* left;
-    struct node* right;
-} node;
-
-typedef struct tree {
-    node* root;
-    node** nodes;
-    int size;
-} tree;
+#include "huffman.h"
 
 node* createNode(char c, unsigned freq) {
     node* newNode = (node*)malloc(sizeof(node));
@@ -145,21 +132,5 @@ int treeStateNext(tree* t) {
 
     t->root = newNode;
     displayTree(t->root, 0);
-    return 0;
-}
-
-int main() {
-    char ar[] = "abbcccddddeeeee";
-    tree* t = treeInit(ar);
-    int a;
-    while(1) {
-        scanf("%d",&a);
-        if(a==0) {
-            if(treeStateNext(t)) break;
-        }
-        else break;
-    }
-
-    freeTree(t);
     return 0;
 }
