@@ -51,12 +51,10 @@ int main() {
 
     SetTargetFPS(60);
 
-    char ar[] = "abcdefghijklmnopqrstuvwxyz";
+    char ar[] = "hello niga";
     tree *t = treeInit(ar);
-    while(1) {
-        if(treeStateNext(t) == 1) break;
-    }
 
+    bool nKeyPressed = false;
     while (!WindowShouldClose()) {
         previousMousePosition = mousePosition;
         mousePosition = GetMousePosition();
@@ -66,6 +64,9 @@ int main() {
         BeginMode2D(camera);
 
         drawNode(t->root, screenWidth / 2, 50, 0);
+        for(int i=0; i<t->size; i++) {
+            DrawText(TextFormat("f:%d-c:%c", t->nodes[i]->freq,t->nodes[i]->c),100*(i+1),screenHeight-50, textsize, WHITE);
+        }
 
         EndMode2D();
         EndDrawing();
@@ -74,6 +75,14 @@ int main() {
             camera.target.x -= (mousePosition.x - previousMousePosition.x);
             camera.target.y -= (mousePosition.y - previousMousePosition.y);
         }
+        if (IsKeyDown(KEY_N) && !nKeyPressed) {
+            if (treeStateNext(t) != 1) {
+                // generateHuffmanCodes(t->root, "", 0);
+                printf("\n");
+            }
+            nKeyPressed = true;
+        }
+        if (!IsKeyDown(KEY_N)) nKeyPressed = false;
     }
 
     freeTree(t);

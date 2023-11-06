@@ -34,9 +34,17 @@ void displayTree(node* root, int level) { // DEBUG
     }
 }
 
-unsigned int codeGen(const char c) {
-    unsigned int a = 1000123;
-    return a;
+void generateHuffmanCodes(node* root, char* code, int depth) {
+    static char codeBuffer[256];
+    if (root == NULL) return;
+    if (root->leaf) {
+        codeBuffer[depth] = '\0';
+        printf("%c:%s\n", root->c, codeBuffer);
+    }
+    codeBuffer[depth] = '0';
+    generateHuffmanCodes(root->left, codeBuffer, depth + 1);
+    codeBuffer[depth] = '1';
+    generateHuffmanCodes(root->right, codeBuffer, depth + 1);
 }
 
 void freeNodes(node* root) {
