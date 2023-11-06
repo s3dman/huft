@@ -66,10 +66,9 @@ int main() {
 
     SetTargetFPS(60);
 
-    struct node *root = createtree(); // Get the root node from the constructed tree
+    struct node *root = createTree();
 
-    int depth = getMaxDepth(root); // Calculate the depth of the tree
-
+    int depth = getMaxDepth(root);
     while (!WindowShouldClose()) {
         previousMousePosition = mousePosition;
         mousePosition = GetMousePosition();
@@ -78,8 +77,7 @@ int main() {
 
         BeginMode2D(camera);
 
-        drawNode(root, screenWidth / 2, 50, 0, depth); // Draw the tree
-
+        drawNode(root, screenWidth / 2, 50, 0, depth);
         EndMode2D();
         EndDrawing();
 

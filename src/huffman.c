@@ -11,6 +11,12 @@ typedef struct node {
     struct node* right;
 } node;
 
+typedef struct tree {
+    node* root;
+    node** nodes;
+    int size;
+} tree;
+
 node* createNode(char c, unsigned freq) {
     node* newNode = (node*)malloc(sizeof(node));
     newNode->leaf = true;
@@ -41,64 +47,126 @@ void displayTree(node* root, int level) {
     }
 }
 
-void freeTree(node* root) {
-    if(root==NULL) return;
-    freeTree(root->left);
-    freeTree(root->right);
+void freeNodes(node* root) {
+    if (root == NULL) return;
+    freeNodes(root->left);
+    freeNodes(root->right);
     free(root);
 }
 
-// int main() {
-struct node *createtree() {
-    char chars[] = {'A', 'B', 'C','D'};
-    unsigned freqs[] = { 14,9,4,12};
-    int size = sizeof(chars) / sizeof(chars[0]);
+void freeTree(tree* tree) {
+    freeNodes(tree->root);
+    free(tree->nodes);
+    free(tree);
+}
 
-    node* nodes[size];
-    for (int i = 0; i < size; i++) {
-        nodes[i] = createNode(chars[i], freqs[i]);
+tree* treeInit(const char* input) {
+    size_t length = strlen(input);
+    char* chars = (char*)malloc(length * sizeof(char));
+    int* freqs = (int*)malloc(length * sizeof(int));
+
+    if (chars == NULL || freqs == NULL) {
+        fprintf(stderr, "Memory allocation failed.\n");
+        exit(0);
     }
 
-    int nodeCount = size;
-    node* huffmanTree = NULL;
+    for (int i = 0; i < length; i++) {
+        chars[i] = '\0';
+        freqs[i] = 0;
+    }
 
-    while (nodeCount > 1) {
-        char input[10];
-        scanf("%s", input);
-        if (strcmp(input, "p") == 0) {
-            for (int i = 0; i < nodeCount - 1; i++) {
-                for (int j = i + 1; j < nodeCount; j++) {
-                    if (nodes[i]->freq < nodes[j]->freq) {
-                        node* temp = nodes[i];
-                        nodes[i] = nodes[j];
-                        nodes[j] = temp;
-                    }
-                }
+    int end = 0;
+
+    for (int i = 0; i < length; i++) {
+        char currentChar = input[i];
+        bool found = false;
+
+        for (int j = 0; j < end; j++) {
+            if (chars[j] == currentChar) {
+                freqs[j]++;
+                found = true;
             }
+        }
 
-            printf("%d %d\n", nodes[nodeCount - 1]->freq, nodes[nodeCount - 2]->freq);
-            node* newNode = mergeNodes(nodes[nodeCount - 1], nodes[nodeCount - 2]);
-            nodes[nodeCount - 2] = newNode;
-            nodeCount--;
-
-            for (int k = 0; k < nodeCount; k++) {
-                printf("%d ", nodes[k]->freq);
-            }
-            printf("\n");
-
-            huffmanTree = newNode;
-            displayTree(huffmanTree, 0);
-
-        } else if (strcmp(input, "q") == 0) {
-            break;
-        } else {
-            printf("Invalid input.\n");
+        if (!found) {
+            chars[end] = currentChar;
+            freqs[end] = 1;
+            end++;
         }
     }
 
-    return huffmanTree;
-    if (huffmanTree) freeTree(huffmanTree);
-    return 0;
+    chars = (char*)realloc(chars, end * sizeof(char));
+    freqs = (int*)realloc(freqs, end * sizeof(int));
 
-    // return NULL;
+    node** nodes = (node**)malloc(end * sizeof(node*));
+    for (int i = 0; i < end; i++) {
+        nodes[i] = createNode(chars[i], freqs[i]);
+    }
+
+    tree* t = (tree*)malloc(sizeof(tree));
+    t->root = NULL;
+    t->nodes = nodes;
+    t->size = end;
+
+    free(chars);
+    free(freqs);
+
+    return t;
+}
+
+int treeStateNext(tree* t) {
+    if(t->size <= 1) {
+        displayTree(t->root, 0);
+        return 1;
+    }
+    for (int i = 0; i < t->size - 1; i++) {
+        for (int j = i + 1; j < t->size; j++) {
+            if (t->nodes[i]->freq < t->nodes[j]->freq) {
+                node* temp = t->nodes[i];
+                t->nodes[i] = t->nodes[j];
+                t->nodes[j] = temp;
+            }
+        }
+    }
+
+    for (int k = 0; k < t->size; k++) {
+        printf("%d ", t->nodes[k]->freq);
+    }
+    printf("\n");
+
+    node* newNode = mergeNodes(t->nodes[t->size - 1], t->nodes[t->size - 2]);
+    t->nodes[t->size - 2] = newNode;
+    t->size--;
+
+    for (int k = 0; k < t->size; k++) {
+        printf("%d ", t->nodes[k]->freq);
+    }
+    printf("\n");
+
+    t->root = newNode;
+    displayTree(t->root, 0);
+    return 0;
+}
+
+// int main(){
+node *createTree() {
+
+    // char ar[] = "aaabbbbbbcc";
+    char ar[100];
+    printf("Enter the input string: ");
+    scanf("%s", ar);
+
+    tree* t = treeInit(ar);
+    int a;
+    while(1) {
+        scanf("%d",&a);
+        if(a==0) {
+            if(treeStateNext(t)) break;
+        }
+        else break;
+    }
+
+    return t->root;
+    freeTree(t);
+    // return 0;
 }
