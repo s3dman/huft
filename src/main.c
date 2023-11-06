@@ -77,7 +77,7 @@ int main() {
         }
         if (IsKeyDown(KEY_N) && !nKeyPressed) {
             if (treeStateNext(t) != 1) {
-                // generateHuffmanCodes(t->root, "", 0);
+                generateHuffmanCodes(t->root, "", 0);
                 printf("\n");
             }
             nKeyPressed = true;
