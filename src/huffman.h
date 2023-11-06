@@ -17,3 +17,4 @@ typedef struct tree {
 tree* treeInit(const char*);
 void freeTree(tree*);
 int treeStateNext(tree* t);
+unsigned int codeGen(const char);

@@ -34,6 +34,11 @@ void displayTree(node* root, int level) { // DEBUG
     }
 }
 
+unsigned int codeGen(const char c) {
+    unsigned int a = 1000123;
+    return a;
+}
+
 void freeNodes(node* root) {
     if (root == NULL) return;
     freeNodes(root->left);

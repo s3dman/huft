@@ -3,12 +3,13 @@
 #include <stdio.h>
 #include "huffman.h"
 
-#define screenWidth 800
-#define screenHeight 600
+#define screenWidth 1280
+#define screenHeight 720
 #define radius 25
 
 #define verticalSpacing 100
 #define textsize 20
+
 
 void drawNode(node* root, int x, int y, int level) {
     if (root != NULL) {
@@ -42,9 +43,6 @@ int main() {
         0.0f, 0.0f
     };
 
-    camera.offset = (Vector2) {
-        screenWidth / -10.0f, screenHeight / 10.0f
-    };
     camera.rotation = 0.0f;
     camera.zoom = 1.0f;
 
@@ -53,7 +51,7 @@ int main() {
 
     SetTargetFPS(60);
 
-    char ar[] = "nialksjdflsdjfkldsjfldsjflksdjlfkjdl";
+    char ar[] = "abcdefghijklmnopqrstuvwxyz";
     tree *t = treeInit(ar);
     while(1) {
         if(treeStateNext(t) == 1) break;
