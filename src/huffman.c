@@ -50,8 +50,8 @@ void freeTree(node* root) {
 
 // int main() {
 struct node *createtree() {
-    char chars[] = {'A', 'B', 'C','D', 'E'};
-    unsigned freqs[] = { 5, 8, 2, 4, 3};
+    char chars[] = {'A', 'B', 'C','D'};
+    unsigned freqs[] = { 14,9,4,12};
     int size = sizeof(chars) / sizeof(chars[0]);
 
     node* nodes[size];
