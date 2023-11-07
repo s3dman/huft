@@ -10,11 +10,19 @@
 #define verticalSpacing 100
 #define textsize 20
 
+void nodeOverlay(int x,int y,char c, unsigned int f,Vector2 rpos) {
+    if(CheckCollisionPointCircle(rpos,(Vector2) {
+    x,y
+},radius))
+    DrawRectangle(100,100,100,100, GetColor(0xffffff33) );
 
-void drawNode(node* root, int x, int y, int level) {
+}
+
+void drawNode(node* root, int x, int y, int level,Vector2 rpos) {
     if (root != NULL) {
         int dynamicSpacing = screenWidth / (1 << (level+2));
 
+        nodeOverlay(x,y,root->c,root->freq,rpos);
         if(root->leaf==true) {
             DrawCircleLines(x, y, radius, RED);
             DrawText(TextFormat("%c", root->c), x - 10, y - 10, textsize, PINK);
@@ -25,12 +33,12 @@ void drawNode(node* root, int x, int y, int level) {
 
         if (root->left != NULL) {
             DrawLine(x - dynamicSpacing, y + verticalSpacing, x, y, GREEN);
-            drawNode(root->left, x - dynamicSpacing, y + verticalSpacing, level + 1);
+            drawNode(root->left, x - dynamicSpacing, y + verticalSpacing, level + 1,rpos);
         }
 
         if (root->right != NULL) {
             DrawLine(x + dynamicSpacing, y + verticalSpacing, x, y, GREEN);
-            drawNode(root->right, x + dynamicSpacing, y + verticalSpacing, level + 1);
+            drawNode(root->right, x + dynamicSpacing, y + verticalSpacing, level + 1,rpos);
         }
     }
 }
@@ -55,17 +63,26 @@ int main() {
     tree *t = treeInit(ar);
 
     bool nKeyPressed = false;
+    Font jbmTtf = LoadFontEx("../assets/JetBrainsMono-Regular.ttf", 32, 0, 0);
+
     while (!WindowShouldClose()) {
         previousMousePosition = mousePosition;
         mousePosition = GetMousePosition();
+        Vector2 worldMousePos = GetScreenToWorld2D(mousePosition, camera);
+
         BeginDrawing();
         ClearBackground(BLACK);
 
         BeginMode2D(camera);
 
-        drawNode(t->root, screenWidth / 2, 50, 0);
+        drawNode(t->root, screenWidth / 2, 50, 0,worldMousePos);
         for(int i=0; i<t->size; i++) {
-            DrawText(TextFormat("f:%d-c:%c", t->nodes[i]->freq,t->nodes[i]->c),100*(i+1),screenHeight-50, textsize, WHITE);
+            const char* a = TextFormat("{f:%d-c:%c}", t->nodes[i]->freq,t->nodes[i]->c);
+            if(!t->nodes[i]->leaf)
+                a = TextFormat("{f:%d}", t->nodes[i]->freq);
+            DrawTextEx(jbmTtf,a, (Vector2) {
+                0,32*i
+            },32.0f,3, WHITE);
         }
 
         EndMode2D();
