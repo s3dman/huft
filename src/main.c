@@ -1,6 +1,7 @@
 #include "raylib.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "huffman.h"
 
 #define screenWidth 1280
@@ -9,46 +10,65 @@
 
 #define verticalSpacing 100
 
-void nodeOverlay(int x,int y,char c, unsigned int f,Vector2 rpos,Font ttf) {
+void nodeOverlay(int x,int y,char c, unsigned int f,Vector2 rpos,Font ttf,char huffCodeArr[][256]) {
     if(CheckCollisionPointCircle(rpos,(Vector2) {
     x,y
 },radius)) {
-        DrawRectangle(rpos.x-50,rpos.y,100,100, GetColor(0xffffffff) );
+        const char* overlayText = TextFormat("freq: %d\nchar: '%c'\ncode: %s",f,c,huffCodeArr[c]);
+        if(c == '\0') overlayText = TextFormat("PARENT\nfreq: %d",f);
+        Vector2 overlayDim =  MeasureTextEx( ttf,overlayText, 18,0);
+        DrawRectangle(rpos.x-50,rpos.y,100,100, GetColor(0xffffff33) );
+        DrawTextEx(ttf,overlayText, (Vector2) {
+            rpos.x-overlayDim.x/2, rpos.y+50-overlayDim.y/2
+        }, 18,0, WHITE);
     }
 
 }
 
-void drawNode(node* root, int x, int y, int level,Vector2 rpos,Font ttf) {
+void drawNode(node* root, int x, int y, int level,Vector2 rpos,Font ttf,char huffCodeArr[][256]) {
     if (root != NULL) {
         int dynamicSpacing = screenWidth / (1 << (level+2));
+
         const char* tf = NULL;
+        Vector2 tfw;
+
+
+
         if(root->leaf) {
-            DrawCircle(x, y, radius, GREEN);
             tf = TextFormat("%c",root->c);
-        } else {
-            DrawCircle(x, y, radius, PINK);
-            tf = TextFormat("%d",root->freq);
+            tfw =  MeasureTextEx( ttf,tf, 32,0);
+            DrawCircle(x, y, radius, GREEN);
+            DrawTextEx(ttf,tf, (Vector2) {
+                x-tfw.x/2, y-16
+            }, 32,0, BLACK);
+
+        }
+        else {
+            if (root->left != NULL) {
+                tf = TextFormat("%d",root->freq);
+                tfw=  MeasureTextEx( ttf,tf, 32,0);
+                DrawLine(x, y, x-dynamicSpacing, y+verticalSpacing, YELLOW);
+                DrawCircle(x, y, radius, PINK);
+                DrawTextEx(ttf,tf, (Vector2) {
+                    x-tfw.x/2, y-16
+                }, 32,0, BLACK);
+                drawNode(root->left, x - dynamicSpacing, y + verticalSpacing, level + 1,rpos,ttf,huffCodeArr);
+            }
+
+            if (root->right != NULL) {
+                tf = TextFormat("%d",root->freq);
+                tfw=  MeasureTextEx( ttf,tf, 32,0);
+                DrawLine(x, y, x+dynamicSpacing, y+verticalSpacing, YELLOW);
+                DrawCircle(x, y, radius, PINK);
+                DrawTextEx(ttf,tf, (Vector2) {
+                    x-tfw.x/2, y-16
+                }, 32,0, BLACK);
+                drawNode(root->right, x + dynamicSpacing, y + verticalSpacing, level + 1,rpos,ttf,huffCodeArr);
+            }
+
         }
 
-        Vector2 tfw =  MeasureTextEx( ttf,tf, 32,0);
-
-        DrawTextEx(ttf,tf, (Vector2) {
-            x-tfw.x/2, y-16
-        }, 32,0, BLACK);
-
-        if (root->left != NULL) {
-            DrawLine(x - dynamicSpacing, y + verticalSpacing, x, y, YELLOW);
-            drawNode(root->left, x - dynamicSpacing, y + verticalSpacing, level + 1,rpos,ttf);
-        }
-
-        if (root->right != NULL) {
-            DrawLine(x + dynamicSpacing, y + verticalSpacing, x, y, YELLOW);
-            drawNode(root->right, x + dynamicSpacing, y + verticalSpacing, level + 1,rpos,ttf);
-        }
-
-
-
-        nodeOverlay(x,y,root->c,root->freq,rpos,ttf);
+        nodeOverlay(x,y,root->c,root->freq,rpos,ttf,huffCodeArr);
     }
 }
 
@@ -68,8 +88,10 @@ int main() {
 
     SetTargetFPS(60);
 
-    char ar[] = "hello niga";
+    char ar[] = "my name is ademulla";
     tree *t = treeInit(ar);
+    char huffCodeArr[256][256];
+    memset(huffCodeArr, '\0', sizeof(huffCodeArr)); // init with \0
 
     bool nKeyPressed = false;
     Font jbmTtf = LoadFontEx("../assets/JetBrainsMono-Regular.ttf", 32, 0, 0);
@@ -84,7 +106,7 @@ int main() {
 
         BeginMode2D(camera);
 
-        drawNode(t->root, screenWidth / 2, 50, 0,worldMousePos, jbmTtf);
+        drawNode(t->root, screenWidth / 2, 50, 0,worldMousePos, jbmTtf,huffCodeArr);
         for(int i=0; i<t->size; i++) {
             const char* a = TextFormat("{f:%d-c:%c}", t->nodes[i]->freq,t->nodes[i]->c);
             if(!t->nodes[i]->leaf)
@@ -103,8 +125,7 @@ int main() {
         }
         if (IsKeyDown(KEY_N) && !nKeyPressed) {
             if (treeStateNext(t) != 1) {
-                generateHuffmanCodes(t->root, "", 0);
-                printf("\n");
+                generateHuffmanCodes(t->root,huffCodeArr, "", 0);
             }
             nKeyPressed = true;
         }

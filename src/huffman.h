@@ -18,4 +18,4 @@ tree* treeInit(const char*);
 void freeTree(tree*);
 int treeStateNext(tree* t);
 unsigned int codeGen(const char);
-void generateHuffmanCodes(node*, char*, int );
+void generateHuffmanCodes(node*, char[][256],char*, int );
