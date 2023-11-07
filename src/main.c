@@ -21,16 +21,20 @@ void nodeOverlay(int x,int y,char c, unsigned int f,Vector2 rpos,Font ttf) {
 void drawNode(node* root, int x, int y, int level,Vector2 rpos,Font ttf) {
     if (root != NULL) {
         int dynamicSpacing = screenWidth / (1 << (level+2));
-
-
         const char* tf = NULL;
-        if(!root->leaf) {
-            DrawCircleLines(x, y, radius, PINK);
-            tf = TextFormat("%d",root->freq);
-        } else {
-            DrawCircleLines(x, y, radius, GREEN);
+        if(root->leaf) {
+            DrawCircle(x, y, radius, GREEN);
             tf = TextFormat("%c",root->c);
+        } else {
+            DrawCircle(x, y, radius, PINK);
+            tf = TextFormat("%d",root->freq);
         }
+
+        Vector2 tfw =  MeasureTextEx( ttf,tf, 32,0);
+
+        DrawTextEx(ttf,tf, (Vector2) {
+            x-tfw.x/2, y-16
+        }, 32,0, BLACK);
 
         if (root->left != NULL) {
             DrawLine(x - dynamicSpacing, y + verticalSpacing, x, y, YELLOW);
@@ -41,13 +45,8 @@ void drawNode(node* root, int x, int y, int level,Vector2 rpos,Font ttf) {
             DrawLine(x + dynamicSpacing, y + verticalSpacing, x, y, YELLOW);
             drawNode(root->right, x + dynamicSpacing, y + verticalSpacing, level + 1,rpos,ttf);
         }
-        DrawCircle(x, y, radius-1, BLACK);
 
-        Vector2 tfw =  MeasureTextEx( ttf,tf, 32,0);
 
-        DrawTextEx(ttf,tf, (Vector2) {
-            x-tfw.x/2, y-16
-        }, 32,0, WHITE);
 
         nodeOverlay(x,y,root->c,root->freq,rpos,ttf);
     }
