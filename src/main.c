@@ -23,22 +23,22 @@ void drawNode(node* root, int x, int y, int level,Vector2 rpos,Font ttf) {
         int dynamicSpacing = screenWidth / (1 << (level+2));
 
 
-        const char* tf;
-        if(root->leaf) {
-            DrawCircleLines(x, y, radius, RED);
-            tf = TextFormat("%c",root->c);
-        } else {
-            DrawCircleLines(x, y, radius, YELLOW);
+        const char* tf = NULL;
+        if(!root->leaf) {
+            DrawCircleLines(x, y, radius, PINK);
             tf = TextFormat("%d",root->freq);
+        } else {
+            DrawCircleLines(x, y, radius, GREEN);
+            tf = TextFormat("%c",root->c);
         }
 
         if (root->left != NULL) {
-            DrawLine(x - dynamicSpacing, y + verticalSpacing, x, y, GREEN);
+            DrawLine(x - dynamicSpacing, y + verticalSpacing, x, y, YELLOW);
             drawNode(root->left, x - dynamicSpacing, y + verticalSpacing, level + 1,rpos,ttf);
         }
 
         if (root->right != NULL) {
-            DrawLine(x + dynamicSpacing, y + verticalSpacing, x, y, GREEN);
+            DrawLine(x + dynamicSpacing, y + verticalSpacing, x, y, YELLOW);
             drawNode(root->right, x + dynamicSpacing, y + verticalSpacing, level + 1,rpos,ttf);
         }
         DrawCircle(x, y, radius-1, BLACK);
@@ -47,7 +47,7 @@ void drawNode(node* root, int x, int y, int level,Vector2 rpos,Font ttf) {
 
         DrawTextEx(ttf,tf, (Vector2) {
             x-tfw.x/2, y-16
-        }, 32,0, PINK);
+        }, 32,0, WHITE);
 
         nodeOverlay(x,y,root->c,root->freq,rpos,ttf);
     }
