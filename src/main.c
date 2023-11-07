@@ -5,41 +5,51 @@
 
 #define screenWidth 1280
 #define screenHeight 720
-#define radius 25
+#define radius 20
 
 #define verticalSpacing 100
-#define textsize 20
 
-void nodeOverlay(int x,int y,char c, unsigned int f,Vector2 rpos) {
+void nodeOverlay(int x,int y,char c, unsigned int f,Vector2 rpos,Font ttf) {
     if(CheckCollisionPointCircle(rpos,(Vector2) {
     x,y
-},radius))
-    DrawRectangle(100,100,100,100, GetColor(0xffffff33) );
+},radius)) {
+        DrawRectangle(rpos.x-50,rpos.y,100,100, GetColor(0xffffffff) );
+    }
 
 }
 
-void drawNode(node* root, int x, int y, int level,Vector2 rpos) {
+void drawNode(node* root, int x, int y, int level,Vector2 rpos,Font ttf) {
     if (root != NULL) {
         int dynamicSpacing = screenWidth / (1 << (level+2));
 
-        nodeOverlay(x,y,root->c,root->freq,rpos);
-        if(root->leaf==true) {
+
+        const char* tf;
+        if(root->leaf) {
             DrawCircleLines(x, y, radius, RED);
-            DrawText(TextFormat("%c", root->c), x - 10, y - 10, textsize, PINK);
+            tf = TextFormat("%c",root->c);
         } else {
             DrawCircleLines(x, y, radius, YELLOW);
-            DrawText(TextFormat("%d", root->freq), x - 10, y - 10, textsize, WHITE);
+            tf = TextFormat("%d",root->freq);
         }
 
         if (root->left != NULL) {
             DrawLine(x - dynamicSpacing, y + verticalSpacing, x, y, GREEN);
-            drawNode(root->left, x - dynamicSpacing, y + verticalSpacing, level + 1,rpos);
+            drawNode(root->left, x - dynamicSpacing, y + verticalSpacing, level + 1,rpos,ttf);
         }
 
         if (root->right != NULL) {
             DrawLine(x + dynamicSpacing, y + verticalSpacing, x, y, GREEN);
-            drawNode(root->right, x + dynamicSpacing, y + verticalSpacing, level + 1,rpos);
+            drawNode(root->right, x + dynamicSpacing, y + verticalSpacing, level + 1,rpos,ttf);
         }
+        DrawCircle(x, y, radius-1, BLACK);
+
+        Vector2 tfw =  MeasureTextEx( ttf,tf, 32,0);
+
+        DrawTextEx(ttf,tf, (Vector2) {
+            x-tfw.x/2, y-16
+        }, 32,0, PINK);
+
+        nodeOverlay(x,y,root->c,root->freq,rpos,ttf);
     }
 }
 
@@ -75,14 +85,14 @@ int main() {
 
         BeginMode2D(camera);
 
-        drawNode(t->root, screenWidth / 2, 50, 0,worldMousePos);
+        drawNode(t->root, screenWidth / 2, 50, 0,worldMousePos, jbmTtf);
         for(int i=0; i<t->size; i++) {
             const char* a = TextFormat("{f:%d-c:%c}", t->nodes[i]->freq,t->nodes[i]->c);
             if(!t->nodes[i]->leaf)
                 a = TextFormat("{f:%d}", t->nodes[i]->freq);
             DrawTextEx(jbmTtf,a, (Vector2) {
                 0,32*i
-            },32.0f,3, WHITE);
+            },32.0f,0, WHITE);
         }
 
         EndMode2D();
