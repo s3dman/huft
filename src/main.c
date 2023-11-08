@@ -9,6 +9,7 @@
 #define radius 20
 
 #define verticalSpacing 100
+#define MAX_INPUT_CHARS 128
 
 void nodeOverlay(int x,int y,char c, unsigned int f,Vector2 rpos,Font ttf,char huffCodeArr[][256]) {
     if(CheckCollisionPointCircle(rpos,(Vector2) {
@@ -31,8 +32,6 @@ void drawNode(node* root, int x, int y, int level,Vector2 rpos,Font ttf,char huf
 
         const char* tf = NULL;
         Vector2 tfw;
-
-
 
         if(root->leaf) {
             tf = TextFormat("%c",root->c);
@@ -86,15 +85,32 @@ int main() {
     Vector2 mousePosition = { 0.0f, 0.0f };
     Vector2 previousMousePosition = { 0.0f, 0.0f };
 
+    Font jbmTtf = LoadFontEx("../assets/JetBrainsMono-Regular.ttf", 32, 0, 0);
+
     SetTargetFPS(60);
 
-    char ar[] = "my name is ademulla";
+    char ar[] = "suck my dick aaryan";
     tree *t = treeInit(ar);
+    int treeComplete = false;
+
     char huffCodeArr[256][256];
     memset(huffCodeArr, '\0', sizeof(huffCodeArr)); // init with \0
+    char encodedString[1024] = "";
+    Vector2 spacing =  MeasureTextEx( jbmTtf,encodedString, 16,0);
 
-    bool nKeyPressed = false;
-    Font jbmTtf = LoadFontEx("../assets/JetBrainsMono-Regular.ttf", 32, 0, 0);
+    unsigned nKeyPressed = 0;
+
+// textbox
+    char name[MAX_INPUT_CHARS + 1] = "\0";      // NOTE: One extra space required for null terminator char '\0'
+    int letterCount = 0;
+
+    Rectangle textBox = { screenWidth/2.0f - 100, 180, 225, 50 };
+    bool mouseOnText = false;
+
+    int framesCounter = 0;
+//
+
+
 
     while (!WindowShouldClose()) {
         previousMousePosition = mousePosition;
@@ -107,7 +123,8 @@ int main() {
         BeginMode2D(camera);
 
         drawNode(t->root, screenWidth / 2, 50, 0,worldMousePos, jbmTtf,huffCodeArr);
-        for(int i=0; i<t->size; i++) {
+
+        for(int i=0; i<t->size; i++) { // priority queue display
             const char* a = TextFormat("{f:%d-c:%c}", t->nodes[i]->freq,t->nodes[i]->c);
             if(!t->nodes[i]->leaf)
                 a = TextFormat("{f:%d}", t->nodes[i]->freq);
@@ -115,6 +132,20 @@ int main() {
                 0,32*i
             },32.0f,0, WHITE);
         }
+
+        if(treeComplete==1) {
+            strcat(encodedString,"ENCODED STRING: ");
+            for(int i=0; i<strlen(ar); i++)
+                strcat(encodedString,huffCodeArr[ar[i]]);
+            spacing = MeasureTextEx( jbmTtf,encodedString, 16,0);
+            printf("%s\n",encodedString);
+            treeComplete++;
+
+        }
+
+        DrawTextEx(jbmTtf,encodedString,(Vector2) {
+            (screenWidth-spacing.x)/2,screenHeight-2*spacing.y
+        },16,0,WHITE);
 
         EndMode2D();
         EndDrawing();
@@ -124,8 +155,9 @@ int main() {
             camera.target.y -= (mousePosition.y - previousMousePosition.y);
         }
         if (IsKeyDown(KEY_N) && !nKeyPressed) {
-            if (treeStateNext(t) != 1) {
+            if (treeStateNext(t) == 1) {
                 generateHuffmanCodes(t->root,huffCodeArr, "", 0);
+                treeComplete++;
             }
             nKeyPressed = true;
         }
