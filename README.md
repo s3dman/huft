@@ -1,5 +1,7 @@
 # huft
+
 Huffman coding visualizer
+![](https://i.imgur.com/y4nmUy2.png)
 
 ### Prerequisites
 
