@@ -74,6 +74,8 @@ void drawNode(node* root, int x, int y, int level,Vector2 rpos,Font ttf,char huf
 int main() {
     InitWindow(screenWidth, screenHeight, "huft");
 
+    int state = 0;
+
     Camera2D camera = { 0 };
     camera.target = (Vector2) {
         0.0f, 0.0f
@@ -89,30 +91,40 @@ int main() {
 
     SetTargetFPS(60);
 
-    char ar[] = "suck my dick aaryan";
-    tree *t = treeInit(ar);
-    int treeComplete = false;
+    char ar[1024];
+    tree *t;
+    int treeComplete = 0;
 
     char huffCodeArr[256][256];
     memset(huffCodeArr, '\0', sizeof(huffCodeArr)); // init with \0
-    char encodedString[1024] = "";
-    Vector2 spacing =  MeasureTextEx( jbmTtf,encodedString, 16,0);
+    char encodedString[1024];
+    Vector2 spacing;
 
-    unsigned nKeyPressed = 0;
+    bool nKeyPressed = false;
 
-// textbox
-    char name[MAX_INPUT_CHARS + 1] = "\0";      // NOTE: One extra space required for null terminator char '\0'
+    char name[MAX_INPUT_CHARS + 1] = "\0";
     int letterCount = 0;
 
-    Rectangle textBox = { screenWidth/2.0f - 100, 180, 225, 50 };
-    bool mouseOnText = false;
-
-    int framesCounter = 0;
-//
-
-
-
     while (!WindowShouldClose()) {
+
+        if(state==0) {
+            int key = GetCharPressed();
+            while (key > 0)
+            {
+                if ((key >= 32) && (key <= 125) && (letterCount < MAX_INPUT_CHARS)) {
+                    name[letterCount] = (char)key;
+                    name[letterCount+1] = '\0'; // Add null terminator at the end of the string.
+                    letterCount++;
+                }
+                key = GetCharPressed();  // Check next character in the queue
+            }
+            if (IsKeyPressed(KEY_BACKSPACE)) {
+                letterCount--;
+                if (letterCount < 0) letterCount = 0;
+                name[letterCount] = '\0';
+            }
+        }
+
         previousMousePosition = mousePosition;
         mousePosition = GetMousePosition();
         Vector2 worldMousePos = GetScreenToWorld2D(mousePosition, camera);
@@ -122,49 +134,89 @@ int main() {
 
         BeginMode2D(camera);
 
-        drawNode(t->root, screenWidth / 2, 50, 0,worldMousePos, jbmTtf,huffCodeArr);
-
-        for(int i=0; i<t->size; i++) { // priority queue display
-            const char* a = TextFormat("{f:%d-c:%c}", t->nodes[i]->freq,t->nodes[i]->c);
-            if(!t->nodes[i]->leaf)
-                a = TextFormat("{f:%d}", t->nodes[i]->freq);
-            DrawTextEx(jbmTtf,a, (Vector2) {
-                0,32*i
-            },32.0f,0, WHITE);
+        if(state==1 || state == 2) {
+            drawNode(t->root, screenWidth / 2, 50, 0,worldMousePos, jbmTtf,huffCodeArr);
+            //
+            //     for(int i=0; i<t->size; i++) { // priority queue display
+            //         const char* a = TextFormat("{f:%d-c:%c}", t->nodes[i]->freq,t->nodes[i]->c);
+            //         if(!t->nodes[i]->leaf)
+            //             a = TextFormat("{f:%d}", t->nodes[i]->freq);
+            //         DrawTextEx(jbmTtf,a, (Vector2) {
+            //             0,32*i
+            //         },32.0f,0, WHITE);
+            //     }
         }
 
         if(treeComplete==1) {
-            strcat(encodedString,"ENCODED STRING: ");
+            strcpy(encodedString,"ENCODED STRING: ");
             for(int i=0; i<strlen(ar); i++)
                 strcat(encodedString,huffCodeArr[ar[i]]);
+            if(strlen(encodedString)<=16) strcpy(encodedString,"INVALID STRING");
             spacing = MeasureTextEx( jbmTtf,encodedString, 16,0);
             printf("%s\n",encodedString);
             treeComplete++;
 
         }
 
+        EndMode2D();
+
+        char displayString[1024] = "INPUT STRING: ";
+        strcat(displayString,name);
+        Vector2 inputSpacing =MeasureTextEx( jbmTtf,displayString, 16,0);
+        DrawTextEx(jbmTtf,displayString, (Vector2) {
+            (screenWidth-inputSpacing.x)/2, screenHeight-4*inputSpacing.y
+        }, 16,0, WHITE); // input string
+
         DrawTextEx(jbmTtf,encodedString,(Vector2) {
             (screenWidth-spacing.x)/2,screenHeight-2*spacing.y
-        },16,0,WHITE);
+        },16,0,WHITE); //output string
 
-        EndMode2D();
         EndDrawing();
 
+        if(state==0) {
+            if(IsKeyDown(KEY_ENTER)) {
+                strcpy(ar,name);
+                t= treeInit(ar);
+                treeComplete=0;
+                strcpy(encodedString,"...");
+                spacing = MeasureTextEx( jbmTtf,encodedString, 16,0);
+                state++;
+                if (treeStateNext(t) == 1) {
+                    generateHuffmanCodes(t->root,huffCodeArr, "", 0);
+                    treeComplete++;
+                    state++;
+                }
+            }
+        }
+        if(state==1) {
+            if (IsKeyDown(KEY_ENTER) && !nKeyPressed) {
+                if (treeStateNext(t) == 1) {
+                    strcpy(encodedString,"");
+                    generateHuffmanCodes(t->root,huffCodeArr, "", 0);
+                    treeComplete++;
+                    state++;
+                }
+                nKeyPressed = true;
+            }
+            if (!IsKeyDown(KEY_ENTER)) nKeyPressed = false;
+        }
+        if(state==2) {
+            if(IsKeyDown(KEY_BACKSPACE)) {
+                freeTree(t);
+                t=NULL;
+                memset(huffCodeArr, '\0', sizeof(huffCodeArr));
+                strcpy(name,"\0");
+                strcpy(encodedString,"");
+                letterCount=0;
+                state=0;
+            }
+        }
         if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
             camera.target.x -= (mousePosition.x - previousMousePosition.x);
             camera.target.y -= (mousePosition.y - previousMousePosition.y);
         }
-        if (IsKeyDown(KEY_N) && !nKeyPressed) {
-            if (treeStateNext(t) == 1) {
-                generateHuffmanCodes(t->root,huffCodeArr, "", 0);
-                treeComplete++;
-            }
-            nKeyPressed = true;
-        }
-        if (!IsKeyDown(KEY_N)) nKeyPressed = false;
     }
-
-    freeTree(t);
+    if(t!=NULL) freeTree(t);
     CloseWindow();
     return 0;
 }
