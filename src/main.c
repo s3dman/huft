@@ -4,8 +4,8 @@
 #include <string.h>
 #include "huffman.h"
 
-#define screenWidth 1280
-#define screenHeight 720
+#define screenWidth 1680
+#define screenHeight 1000
 #define radius 20
 
 #define verticalSpacing 100
