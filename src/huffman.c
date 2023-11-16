@@ -25,7 +25,7 @@ node *mergeNodes(node *left, node *right)
 }
 
 void displayTree(node *root, int level)
-{ // DEBUG
+{   // DEBUG
     if (root != NULL)
     {
         if (root->leaf)

@@ -13,14 +13,18 @@
 
 void nodeOverlay(int x, int y, char c, unsigned int f, Vector2 rpos, Font ttf, char huffCodeArr[][256])
 {
-    if (CheckCollisionPointCircle(rpos, (Vector2){x, y}, radius))
+    if (CheckCollisionPointCircle(rpos, (Vector2) {
+    x, y
+}, radius))
     {
         const char *overlayText = TextFormat("freq: %d\nchar: '%c'\ncode: %s", f, c, huffCodeArr[c]);
         if (c == '\0')
             overlayText = TextFormat("PARENT\nfreq: %d", f);
         Vector2 overlayDim = MeasureTextEx(ttf, overlayText, 18, 0);
         DrawRectangle(rpos.x - 50, rpos.y, 100, 100, GetColor(0xffffff33));
-        DrawTextEx(ttf, overlayText, (Vector2){rpos.x - overlayDim.x / 2, rpos.y + 50 - overlayDim.y / 2}, 18, 0, WHITE);
+        DrawTextEx(ttf, overlayText, (Vector2) {
+            rpos.x - overlayDim.x / 2, rpos.y + 50 - overlayDim.y / 2
+        }, 18, 0, WHITE);
     }
 }
 
@@ -38,7 +42,9 @@ void drawNode(node *root, int x, int y, int level, Vector2 rpos, Font ttf, char 
             tf = TextFormat("%c", root->c);
             tfw = MeasureTextEx(ttf, tf, 32, 0);
             DrawCircle(x, y, radius, GREEN);
-            DrawTextEx(ttf, tf, (Vector2){x - tfw.x / 2, y - 16}, 32, 0, BLACK);
+            DrawTextEx(ttf, tf, (Vector2) {
+                x - tfw.x / 2, y - 16
+            }, 32, 0, BLACK);
         }
         else
         {
@@ -48,7 +54,9 @@ void drawNode(node *root, int x, int y, int level, Vector2 rpos, Font ttf, char 
                 tfw = MeasureTextEx(ttf, tf, 32, 0);
                 DrawLine(x, y, x - dynamicSpacing, y + verticalSpacing, YELLOW);
                 DrawCircle(x, y, radius, PINK);
-                DrawTextEx(ttf, tf, (Vector2){x - tfw.x / 2, y - 16}, 32, 0, BLACK);
+                DrawTextEx(ttf, tf, (Vector2) {
+                    x - tfw.x / 2, y - 16
+                }, 32, 0, BLACK);
                 drawNode(root->left, x - dynamicSpacing, y + verticalSpacing, level + 1, rpos, ttf, huffCodeArr);
             }
 
@@ -58,7 +66,9 @@ void drawNode(node *root, int x, int y, int level, Vector2 rpos, Font ttf, char 
                 tfw = MeasureTextEx(ttf, tf, 32, 0);
                 DrawLine(x, y, x + dynamicSpacing, y + verticalSpacing, YELLOW);
                 DrawCircle(x, y, radius, PINK);
-                DrawTextEx(ttf, tf, (Vector2){x - tfw.x / 2, y - 16}, 32, 0, BLACK);
+                DrawTextEx(ttf, tf, (Vector2) {
+                    x - tfw.x / 2, y - 16
+                }, 32, 0, BLACK);
                 drawNode(root->right, x + dynamicSpacing, y + verticalSpacing, level + 1, rpos, ttf, huffCodeArr);
             }
         }
@@ -74,8 +84,9 @@ int main()
     int state = 0;
 
     Camera2D camera = {0};
-    camera.target = (Vector2){
-        0.0f, 0.0f};
+    camera.target = (Vector2) {
+        0.0f, 0.0f
+    };
 
     camera.rotation = 0.0f;
     camera.zoom = 1.0f;
@@ -166,9 +177,13 @@ int main()
         char displayString[1024] = "INPUT STRING: ";
         strcat(displayString, name);
         Vector2 inputSpacing = MeasureTextEx(jbmTtf, displayString, 16, 0);
-        DrawTextEx(jbmTtf, displayString, (Vector2){(screenWidth - inputSpacing.x) / 2, screenHeight - 4 * inputSpacing.y}, 16, 0, WHITE); // input string
+        DrawTextEx(jbmTtf, displayString, (Vector2) {
+            (screenWidth - inputSpacing.x) / 2, screenHeight - 4 * inputSpacing.y
+        }, 16, 0, WHITE); // input string
 
-        DrawTextEx(jbmTtf, encodedString, (Vector2){(screenWidth - spacing.x) / 2, screenHeight - 2 * spacing.y}, 16, 0, WHITE); // output string
+        DrawTextEx(jbmTtf, encodedString, (Vector2) {
+            (screenWidth - spacing.x) / 2, screenHeight - 2 * spacing.y
+        }, 16, 0, WHITE); // output string
 
         EndDrawing();
 
