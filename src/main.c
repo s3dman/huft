@@ -11,10 +11,20 @@
 #define verticalSpacing 100
 #define MAX_INPUT_CHARS 128
 
-v
+void nodeOverlay(int x, int y, char c, unsigned int f, Vector2 rpos, Font ttf, char huffCodeArr[][256])
+{
+    if (CheckCollisionPointCircle(rpos, (Vector2){x, y}, radius))
+    {
+        const char *overlayText = TextFormat("freq: %d\nchar: '%c'\ncode: %s", f, c, huffCodeArr[c]);
+        if (c == '\0')
+            overlayText = TextFormat("PARENT\nfreq: %d", f);
+        Vector2 overlayDim = MeasureTextEx(ttf, overlayText, 18, 0);
+        DrawRectangle(rpos.x - 50, rpos.y, 100, 100, GetColor(0xffffff33));
+        DrawTextEx(ttf, overlayText, (Vector2){rpos.x - overlayDim.x / 2, rpos.y + 50 - overlayDim.y / 2}, 18, 0, WHITE);
+    }
+}
 
-    void
-    drawNode(node *root, int x, int y, int level, Vector2 rpos, Font ttf, char huffCodeArr[][256])
+void drawNode(node *root, int x, int y, int level, Vector2 rpos, Font ttf, char huffCodeArr[][256])
 {
     if (root != NULL)
     {
